@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Englisch mit Holly</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F2F4F7;--ink:#101C33;--mute:#5A6577;--card:#fff;--line:#DDE3EC;--sky:#DCE6F5;--red:#C42B20;--navy:#101C33;--ok:#E3F2E8;--okt:#17482F;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0E1424;--ink:#EEF1F8;--mute:#9AA6C4;--card:#18203A;--line:#2B3557;--sky:#24304F;--navy:#3A4A7A;--ok:#17352A;--okt:#CDEBD9}}
+:root[data-theme="dark"]{--bg:#0E1424;--ink:#EEF1F8;--mute:#9AA6C4;--card:#18203A;--line:#2B3557;--sky:#24304F;--navy:#3A4A7A;--ok:#17352A;--okt:#CDEBD9}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{height:100%;margin:0}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.4}
+#app{height:100%;max-width:430px;margin:0 auto;display:flex;flex-direction:column}
+.scr{display:none;flex:1;flex-direction:column;min-height:0}.scr.on{display:flex}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+[data-ic]{display:inline-flex}
+.av{border-radius:50%;background:var(--sky);overflow:hidden;flex:none;display:flex;align-items:center;justify-content:center;font-weight:700}
+.av canvas{display:block;width:100%;height:100%}
+.pad{flex:1;min-height:0;overflow:auto;padding:28px 24px 0;display:flex;flex-direction:column;gap:20px}
+.top{display:flex;justify-content:space-between;align-items:center;font-size:18px;font-weight:700}
+.pill{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:6px 14px;font-size:14px}
+h1{margin:0;font-size:34px;line-height:1.1}
+.mute{color:var(--mute)}.sm{font-size:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:22px;display:flex;flex-direction:column;gap:16px}
+.who{display:flex;align-items:center;gap:14px}.nm{font-size:24px;font-weight:700}
+.bub{background:var(--sky);border-radius:18px;border-bottom-left-radius:4px;padding:12px 16px;font-size:16px}
+.cta{min-height:56px;border:0;border-radius:16px;background:var(--red);color:#fff;font-size:17px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px}
+.dash{border:1.5px dashed #AAB4C3;border-radius:20px;padding:16px;font-size:15px;color:var(--mute)}
+.str{display:flex;align-items:center;justify-content:space-between;font-size:15px;font-weight:700;padding-bottom:12px}
+#dots{display:flex;gap:6px}#dots i{width:12px;height:12px;border-radius:50%;background:#C9D1DD}#dots i.on{background:var(--ink)}
+.tabs{display:flex;border-top:1px solid var(--line);background:var(--card);padding:8px 8px 12px}
+.tabs button{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;min-height:48px;border:0;background:none;font-size:12px;color:var(--mute)}
+.tabs button.on{color:var(--ink);font-weight:700}#app.inchat .tabs{display:none}
+.lst{display:flex;flex-direction:column;gap:10px;padding-bottom:16px}.lst h2{margin:8px 0 0;font-size:16px}
+.it{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;display:flex;gap:10px;align-items:center}.it>div{flex:1;min-width:0;overflow-wrap:anywhere}.it button{border:0;background:none;min-width:40px;min-height:40px;color:var(--mute)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.stt{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px}.stt b{display:block;font-size:28px}
+.bars{display:flex;align-items:flex-end;gap:8px;height:110px;margin-top:12px}.bars div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;font-size:12px;color:var(--mute)}.bars i{width:100%;background:var(--ink);border-radius:6px 6px 0 0;min-height:3px}
+.pad{padding-bottom:16px}
+.ch{display:flex;align-items:center;gap:10px;padding:12px 10px;background:var(--card);border-bottom:1px solid var(--line)}
+.ch button{border:0;background:none;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;font-size:13px;text-decoration:underline;color:var(--mute)}
+.grow{flex:1;min-width:0}
+.log{flex:1;min-height:0;overflow:auto;padding:18px 16px;display:flex;flex-direction:column;gap:12px}
+.m{max-width:82%;border-radius:18px;padding:12px 14px;font-size:16px;overflow-wrap:anywhere}
+.m.h{align-self:flex-start;background:var(--card);border:1px solid var(--line);border-bottom-left-radius:4px}
+.m.u{align-self:flex-end;background:var(--navy);color:#fff;border-bottom-right-radius:4px}
+.m.ty{color:var(--mute)}
+.tl{display:flex;align-items:center;gap:12px;margin-top:8px;font-size:13px;color:var(--mute)}
+.tl button{border:0;background:none;color:var(--mute);min-width:32px;min-height:32px;padding:4px;font-size:13px}.tl .tx{text-decoration:underline}
+.de{margin-top:6px;font-size:14px;color:var(--mute)}
+.fx{align-self:flex-end;max-width:88%;background:var(--ok);color:var(--okt);border-radius:14px;padding:12px 14px;font-size:14px;line-height:1.45}
+.nt{align-self:center;text-align:center;font-size:13px;color:var(--mute);padding:4px 12px}
+.bar{display:flex;align-items:center;gap:10px;padding:12px 14px 16px;background:var(--card);border-top:1px solid var(--line)}
+.rb,.nb{border-radius:50%;border:0;color:#fff;display:flex;align-items:center;justify-content:center;flex:none}
+.rb{width:56px;height:56px;background:var(--red)}.rb.rec{outline:4px solid rgba(196,43,32,.35)}
+.nb{width:48px;height:48px;background:var(--navy)}
+#in{flex:1;min-width:0;height:48px;border:1.5px solid var(--line);border-radius:24px;padding:0 16px;font:inherit;font-size:16px;background:var(--bg);color:var(--ink)}
+.chars{display:flex;gap:14px;overflow-x:auto;padding:4px 2px}.chr{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:13px;min-width:64px}.cc{width:56px;height:56px;border-radius:50%;background:var(--sky);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px}.chr.lk .cc{background:var(--card);border:1.5px dashed #AAB4C3;color:var(--mute)}
+.chr.on{font-weight:700}.chr.on .cc{box-shadow:0 0 0 3px var(--ink)}
+</style>
+</head>
+<body>
+<div id="app">
+<section id="home" class="scr on">
+ <div class="pad">
+  <div class="top"><span>Englisch mit</span><span class="pill" id="lv">Level –</span></div>
+  <div><h1 id="gr">Good morning!</h1><p class="mute" id="subT" style="margin:6px 0 0">Holly wartet schon auf dich.</p></div>
+  <div class="card">
+   <div class="who"><div class="av" id="avH" style="width:88px;height:88px"></div><div><div class="nm" id="nmH">Holly</div><div class="mute sm" id="infoH">21 · London · jobbt in einem Café</div></div></div>
+   <div class="bub" id="bub">Hey! Tell me about your day. I’m all ears.</div>
+   <button class="cta" id="go"><i data-ic="mic"></i> <span id="ctaT">Mit Holly sprechen</span></button>
+  </div>
+  <div class="chars" id="chars"></div>
+  <button onclick="LS.s('tst',LS.g('tst')?'':'1');drawStreak()" style="font-size:13px;min-height:40px;border:1px dashed #AAB4C3;border-radius:12px;background:none;color:var(--mute);padding:6px 12px">Test: alle Charaktere ein/aus</button>
+  <div class="str"><span id="sk"></span><span id="dots"></span></div>
+ </div>
+</section>
+<section id="chat" class="scr">
+ <header class="ch">
+  <button id="bk" aria-label="Zurück"><i data-ic="back"></i></button>
+  <div class="av" id="avC" style="width:44px;height:44px"></div>
+  <div class="grow"><b id="cn" style="font-size:18px">Holly</b><div class="mute" style="font-size:13px" id="st">online · britisches Englisch</div></div>
+  <button id="vc" aria-label="Andere Stimme wählen">Stimme</button>
+  <button id="nw" aria-label="Neues Gespräch">Neu</button>
+ </header>
+ <div class="log" id="log" aria-live="polite"></div>
+ <div class="bar">
+  <button class="rb" id="mic" aria-label="Sprechen"><i data-ic="mic"></i></button>
+  <input id="in" type="text" aria-label="Nachricht" placeholder="Sprechen oder tippen …" autocomplete="off">
+  <button class="nb" id="snd" aria-label="Senden"><i data-ic="snd" data-s="20"></i></button>
+ </div>
+</section>
+<section id="words" class="scr"><div class="pad"><div class="top"><span>Wörter</span></div><p class="mute" style="margin:0">Neue Wörter und Tipps aus deinen Gesprächen.</p><div id="wl" class="lst"></div></div></section>
+<section id="prog" class="scr"><div class="pad"><div class="top"><span>Fortschritt</span><span class="pill" id="lv2">Level –</span></div><div class="grid" id="stats"></div><div class="card"><b>Nachrichten pro Tag</b><div class="bars" id="bars"></div></div></div></section>
+<nav class="tabs" id="tb" aria-label="Bereiche"><button data-go="home" class="on"><i data-ic="chat"></i>Gespräch</button><button data-go="words"><i data-ic="book"></i>Wörter</button><button data-go="prog"><i data-ic="bar"></i>Fortschritt</button></nav>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* ===== Holly in 3D (Version 4, Kopf und Schulter als Profilbild) ===== */
+var H=(function(){
+if(!window.THREE)return null;
+var T=THREE,R;try{R=new T.WebGLRenderer({antialias:true,alpha:true})}catch(e){return null}
+R.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+var sc=new T.Scene(),cam=new T.PerspectiveCamera(30,1,.1,50);cam.position.set(0,.55,3.7);cam.lookAt(0,.5,0);
+sc.add(new T.HemisphereLight(0xffffff,0xb7c4dc,.95));var sun=new T.DirectionalLight(0xffffff,.8);sun.position.set(1.5,2,3);sc.add(sun);
+function M(c,r){return new T.MeshStandardMaterial({color:c,roughness:r})}
+function mesh(g,m,x,y,z,a,b,c){var o=new T.Mesh(g,m);o.position.set(x,y,z);if(a)o.scale.set(a,b,c);return o}
+function sq(g,p){var a=g.attributes.position;for(var i=0;i<a.count;i++){var x=a.getX(i),y=a.getY(i),z=a.getZ(i);a.setXYZ(i,Math.sign(x)*Math.pow(Math.abs(x),p),Math.sign(y)*Math.pow(Math.abs(y),p),Math.sign(z)*Math.pow(Math.abs(z),p))}g.computeVertexNormals();return g}
+var HW=.7,HH=.56,HD=.52,P=.72;
+function hz(x,y){var u=Math.abs(x)/HW,v=Math.abs(y)/HH,w=1-Math.pow(u,2/P)-Math.pow(v,2/P);return w<=0?0:HD*Math.pow(w,P/2)}
+var skin=M(0xf8d6bc,.32),hairM=M(0x10c4ba,.3),hairD=M(0x10c4ba,.3),red=M(0xd1281d,.22),dark=M(0x0b0b10,.12),belt=M(0x15151a,.35),gold=M(0xffc61f,.22),gold2=M(0xe6a200,.3);hairD.side=T.DoubleSide;
+var B=new T.Group();sc.add(B);var eyes=[],sides=[],S={talk:false,listen:false,think:false,nod:0};
+/* Oberkörper */
+var ctl=[[-.32,.24],[-.2,.25],[-.05,.28],[.04,.3],[.08,.25],[.11,.13]];
+function rAt(y){for(var i=0;i<ctl.length-1;i++){var a=ctl[i],b=ctl[i+1];if(y<=b[0])return a[1]+(b[1]-a[1])*(y-a[0])/(b[0]-a[0])}return ctl[5][1]}
+var pts=[];for(var i=0;i<=24;i++){var y=-.32+i*(.43/24);pts.push(new T.Vector2(rAt(y),y))}
+var torso=new T.Mesh(new T.LatheGeometry(pts,36),red);torso.scale.z=.7;B.add(torso);
+B.add(mesh(new T.CylinderGeometry(.065,.07,.14,16),skin,0,.1,0));
+var col=mesh(new T.TorusGeometry(.165,.022,8,28),red,0,.085,0,1,1,.7);col.rotation.x=Math.PI/2;B.add(col);
+[-1,1].forEach(function(s){
+ var q=[[.1,.1],[.125,.03],[.135,-.07]].map(function(p){var r=rAt(p[1]);return new T.Vector3(s*p[0],p[1],.7*Math.sqrt(Math.max(r*r-p[0]*p[0],0))+.01)});
+ B.add(new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(q),12,.02,8,false),gold));
+ var g=new T.Group();g.position.set(s*.3,-.02,.04);g.rotation.z=s*.75;B.add(g);
+ g.add(mesh(new T.SphereGeometry(.075,14,10),red,0,0,0));g.add(mesh(new T.CylinderGeometry(.065,.06,.16,14),red,0,-.08,0));
+ var e=new T.Group();e.position.set(0,-.16,0);e.rotation.z=-s*1.37;g.add(e);
+ e.add(mesh(new T.SphereGeometry(.06,12,8),red,0,0,0));e.add(mesh(new T.CylinderGeometry(.06,.052,.14,14),red,0,-.07,0));
+ e.add(mesh(new T.SphereGeometry(.058,14,10),skin,0,-.185,0,1,1.05,.7))});
+B.add(mesh(new T.CylinderGeometry(.262,.262,.07,40),belt,0,-.3,0,1,1,.72));
+var bu=mesh(new T.CylinderGeometry(.085,.085,.04,32),gold,0,-.3,.2);bu.rotation.x=Math.PI/2;B.add(bu);
+var b2=mesh(new T.CylinderGeometry(.052,.052,.05,32),gold2,0,-.3,.205);b2.rotation.x=Math.PI/2;B.add(b2);
+B.add(mesh(new T.CylinderGeometry(.24,.36,.22,40),red,0,-.41,0,1,1,.78));
+/* Kopf */
+var pivot=new T.Group();pivot.position.set(0,.1,0);B.add(pivot);
+var head=new T.Group();head.position.set(0,.5,0);pivot.add(head);
+head.add(mesh(sq(new T.SphereGeometry(1,56,36),P),skin,0,0,0,HW,HH,HD));
+var hs=[HW*1.07,HH*1.07,HD*1.09];
+head.add(mesh(sq(new T.SphereGeometry(1,48,32,Math.PI,Math.PI,0,2.65),P),hairD,0,0,0,hs[0],hs[1],hs[2]));
+var fl=[1.12,1.18,1.14,1.18,1.12,1.18,1.14,1.18,1.12];
+for(var i=0;i<9;i++){var k=i%2?1.012:1;head.add(mesh(sq(new T.SphereGeometry(1,6,14,i*Math.PI/9,Math.PI/9+.015,0,fl[i]),P),hairD,0,0,0,hs[0]*k,hs[1]*k,hs[2]*k))}
+var bp=[],bA=hs[0]+.025,bB=hs[1]+.025;
+for(var i=0;i<=40;i++){var a=.12+(Math.PI-.24)*i/40,c=Math.cos(a),sn=Math.sin(a);bp.push(new T.Vector3(bA*Math.sign(c)*Math.pow(Math.abs(c),P),bB*Math.pow(sn,P),.1))}
+head.add(new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(bp),60,.035,10,false),red));
+[0,40].forEach(function(j){head.add(mesh(new T.SphereGeometry(.035,12,8),red,bp[j].x,bp[j].y,bp[j].z))});
+[-1,1].forEach(function(s){
+ var hg=new T.Group();hg.position.set(s*.7,.35,-.02);head.add(hg);sides.push({g:hg,s:s});
+ hg.add(mesh(sq(new T.SphereGeometry(1,28,28),.55),hairM,0,-.45,0,.085,.45,.44));
+ var ex=.27,ey=-.04,zc=hz(ex,ey)-.03,g=new T.Group();g.position.set(s*ex,ey,0);head.add(g);eyes.push(g);
+ g.add(mesh(new T.SphereGeometry(.17,32,20),dark,0,0,zc,1,1.06,.3));
+ var p=new T.Group();p.name="p";g.add(p);p.add(mesh(new T.SphereGeometry(.12,28,18),dark,0,0,zc+.02,1,1.06,.3));
+ [.9,1.25,1.6].forEach(function(a){var l=mesh(new T.BoxGeometry(.016,.095,.012),dark,s*.215*Math.sin(a),.235*Math.cos(a),zc+.03);l.rotation.z=-s*a;g.add(l)});
+ var br=mesh(sq(new T.SphereGeometry(1,20,12),.5),dark,s*ex,.225,hz(ex,.225)+.005,.1,.018,.025);br.rotation.z=s*.14;br.rotation.y=s*.3;head.add(br)});
+var ng=new T.Group();ng.position.set(0,-.17,hz(0,-.17));ng.rotation.z=Math.PI;head.add(ng);
+var nc=new T.Mesh(new T.ConeGeometry(.045,.09,3),new T.MeshStandardMaterial({color:0xe9a98a,roughness:.4,flatShading:true}));nc.rotation.x=Math.PI/2;ng.add(nc);
+var smile=new T.Mesh(new T.TorusGeometry(.05,.012,8,24,Math.PI),M(0xb5483f,.4));smile.rotation.z=Math.PI;smile.position.set(0,-.29,hz(0,-.29)-.005);head.add(smile);
+var mouth=mesh(new T.SphereGeometry(.065,20,12),M(0x6e1f1f,.5),0,-.32,hz(0,-.32)-.03,1,.1,.3);head.add(mouth);
+/* Bewegung */
+var look={x:0,y:0},tg={x:0,y:0},blinkAt=1.5,blink=0,t0=performance.now();
+addEventListener("pointermove",function(e){tg.y=(e.clientX/innerWidth-.5)*1.1;tg.x=(e.clientY/innerHeight-.5)*.6});
+function frame(now){requestAnimationFrame(frame);if(!R.domElement.parentNode)return;var t=(now-t0)/1000;
+ look.x+=(tg.x-look.x)*.08;look.y+=(tg.y-look.y)*.08;S.nod*=.94;
+ pivot.rotation.y=look.y*.8+Math.sin(t*.7)*.04;
+ pivot.rotation.x=look.x*.7+Math.sin(t*1.1)*.02+Math.sin(S.nod*Math.PI*3)*.1*S.nod+(S.listen?.05:0);
+ pivot.rotation.z+=((S.listen?.14:S.think?-.08:0)-pivot.rotation.z)*.08;
+ B.position.y=Math.sin(t*1.6)*.01;
+ sides.forEach(function(b){b.g.rotation.z=b.s*(Math.sin(t*1.8+b.s)*.012+look.y*.03)});
+ if(t>blinkAt){blink=1;blinkAt=t+2+Math.random()*3}
+ blink=Math.max(0,blink-.12);var by=1-Math.sin(blink*Math.PI)*.92,wide=S.listen?1.08:1;
+ eyes.forEach(function(g){g.scale.set(wide,by*wide,1);var p=g.getObjectByName("p");p.position.x=look.y*.03;p.position.y=-look.x*.025});
+ var open=S.talk?(.25+.75*Math.abs(Math.sin(t*13)*Math.sin(t*5.3+1))):0;
+ mouth.scale.set(1,.05+open,.3);mouth.visible=S.talk;smile.visible=!S.talk||open<.2;
+ R.render(sc,cam)}
+requestAnimationFrame(frame);
+S.mount=function(el,px){el.textContent="";el.appendChild(R.domElement);R.setSize(px,px,false)};
+return S})();
+
+/* ===== App ===== */
+var $=function(i){return document.getElementById(i)};
+function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+var LS={g:function(k){try{return localStorage.getItem(k)}catch(e){return null}},s:function(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+var IC={mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',spk:'<path d="M4 9v6h4l5 4V5L8 9H4zM16 9a4 4 0 0 1 0 6"/>',snd:'<path d="M4 12l16-8-6 16-3-7-7-1z"/>',chat:'<path d="M4 5h16v11H9l-5 4V5z"/>',book:'<path d="M5 4h10a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3V4z"/>',bar:'<path d="M5 20V10M12 20V4M19 20v-7"/>',back:'<path d="M15 5l-7 7 7 7"/>'};
+function ic(n,s){return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+IC[n]+'</svg>'}
+Array.prototype.forEach.call(document.querySelectorAll("[data-ic]"),function(e){e.innerHTML=ic(e.getAttribute("data-ic"),e.getAttribute("data-s")||24)});
+function place(box,px){if(H)H.mount(box,px);else box.textContent="H"}
+var hr=new Date().getHours();$("gr").textContent=hr<12?"Good morning!":hr<18?"Good afternoon!":"Good evening!";
+if(LS.g("hl"))$("lv").textContent=$("lv2").textContent="Level "+LS.g("hl");
+/* Serie */
+function dk(d){return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate()}
+var days=[];try{days=JSON.parse(LS.g("hd")||"[]")}catch(e){}
+function wk(d){var t=new Date(d.getFullYear(),d.getMonth(),d.getDate());var y=new Date(t.getFullYear(),0,1);return t.getFullYear()+'-'+Math.ceil(((t-y)/864e5+y.getDay()+1)/7)}
+function streak(){var n=0,d=new Date(),used={};if(days.indexOf(dk(d))<0)d.setDate(d.getDate()-1);for(var k=0;k<400;k++){if(days.indexOf(dk(d))>-1)n++;else{var w=wk(d);if(used[w])break;used[w]=1}d.setDate(d.getDate()-1)}return n}
+var CH=[{n:'Holly',i:'H'},{n:'Ruby',i:'R'},{n:'Callum',i:'C'},{n:'Jack',i:'J'},{n:'Nora',i:'N'}];
+function drawStreak(){var n=streak(),b=Math.max(+(LS.g('hb')||0),n);LS.s('hb',b);var u=LS.g('tst')?CH.length:Math.min(CH.length,1+Math.floor(b/5));$('sk').textContent=n?n+(n>1?' Tage':' Tag')+' in Folge':'Heute noch nicht gesprochen';var d=$('dots');d.textContent='';var f=n?((n-1)%5)+1:0;for(var i=0;i<5;i++)d.appendChild(el('i',i<f?'on':''));var cr=$('chars');if(cr){cr.textContent='';CH.forEach(function(c,j){var x=el('div','chr'+(j<u?'':' lk')+(c.n.toLowerCase()===CURK?' on':''));x.appendChild(el('div','cc',j<u?c.i:'🔒'));if(j<u)x.onclick=function(){setChar(c.n.toLowerCase());drawStreak()};x.appendChild(el('div','mute sm',j<u?c.n:'noch '+(5*j-b)+' Tage'));cr.appendChild(x)})}}
+var cnt={};try{cnt=JSON.parse(LS.g("hc")||"{}")}catch(e){}
+function mark(){var t=dk(new Date());cnt[t]=(cnt[t]||0)+1;LS.s("hc",JSON.stringify(cnt));if(days.indexOf(t)<0){days.push(t);LS.s("hd",JSON.stringify(days.slice(-60)));drawStreak()}}
+drawStreak();
+/* Hollys Stimme: britisches Englisch, weiblich, jung */
+var V={list:[],i:0,cur:null};
+function loadV(){if(!window.speechSynthesis)return;
+ var rank=["sonia","libby","serena","kate","martha","google uk english female","hazel","susan","stephanie","amy","emma"],bad=/daniel|oliver|arthur|ryan|george|thomas|\bmale\b/i;
+ function sc(v){var n=v.name.toLowerCase(),i=0;for(;i<rank.length;i++)if(n.indexOf(rank[i])>-1)break;return i-(/premium|enhanced|natural/.test(n)?20:0)}
+ var all=speechSynthesis.getVoices().filter(function(v){return/^en[-_]GB/i.test(v.lang)&&!bad.test(v.name)});
+ var fem=all.filter(function(v){return/sonia|libby|serena|kate|martha|female|hazel|susan|stephanie|amy|emma|samantha|moira|tessa/i.test(v.name)});if(fem.length)all=fem;
+ all.sort(function(a,b){return sc(a)-sc(b)});V.list=all;
+ var sv=LS.g("hv2"),ix=0;all.forEach(function(v,j){if(v.name===sv)ix=j});V.i=ix;V.cur=all[ix]||null;
+ $("vc").style.display=all.length>1?"":"none"}
+if(window.speechSynthesis){loadV();speechSynthesis.onvoiceschanged=loadV}else $("vc").style.display="none";
+function say(text){if(!window.speechSynthesis)return;
+ try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(text);u.lang="en-GB";if(V.cur)u.voice=V.cur;u.pitch=1.12;u.rate=1.03;
+ u.onstart=function(){if(H)H.talk=true};u.onend=u.onerror=function(){if(H)H.talk=false};speechSynthesis.speak(u)}catch(e){}}
+function unlock(){try{speechSynthesis.speak(new SpeechSynthesisUtterance(""))}catch(e){}}
+$("vc").onclick=function(){if(!V.list.length)return;V.i=(V.i+1)%V.list.length;V.cur=V.list[V.i];LS.s("hv2",V.cur.name);$("st").textContent="Stimme: "+V.cur.name.replace(/^(Microsoft|Google)\s+/,"");say("Hiya! I’m Holly. How’s this voice sounding?")};
+/* Gespräch */
+var GREET="Hey! I’m Holly. What did you get up to today?",GDE="Hey! Ich bin Holly. Was hast du heute so gemacht?",hist=[],busy=false,log=$("log"),inp=$("in");
+try{hist=JSON.parse(LS.g("hm")||"[]")}catch(e){}if(!hist.length)hist=[{r:"h",t:GREET,de:GDE}];
+function saveH(){LS.s("hm",JSON.stringify(hist.slice(-40)))}
+var tips=[],wds=[];try{tips=JSON.parse(LS.g("ht")||"[]");wds=JSON.parse(LS.g("hw")||"[]")}catch(e){}
+function addWords(a){if(!Array.isArray(a))return;a.slice(0,2).forEach(function(w){if(w&&w.en&&w.de&&!wds.some(function(x){return x.en.toLowerCase()===String(w.en).toLowerCase()}))wds.unshift({en:String(w.en),de:String(w.de)})});LS.s("hw",JSON.stringify(wds.slice(0,100)))}
+function item(main,sub){var d=el("div","it"),c=el("div"),b=el("button");c.appendChild(el("b",null,main));c.appendChild(el("div","mute sm",sub));d.appendChild(c);b.setAttribute("aria-label","Vorlesen");b.innerHTML=ic("spk",20);b.onclick=function(){say(main)};d.appendChild(b);return d}
+function drawWords(){var l=$("wl");l.textContent="";if(!wds.length&&!tips.length){l.appendChild(el("div","dash","Hier erscheinen neue Wörter und Tipps, sobald du mit Holly gesprochen hast."));return}
+ if(wds.length){l.appendChild(el("h2",null,"Neue Wörter"));wds.forEach(function(w){l.appendChild(item(w.en,w.de))})}
+ if(tips.length){l.appendChild(el("h2",null,"Deine Korrekturen"));tips.forEach(function(t){l.appendChild(item(t.b,t.w))})}}
+function drawProg(){var tot=0,k,g=$("stats"),b=$("bars");for(k in cnt)tot+=cnt[k];
+ g.textContent="";
+ [[streak(),"Tage in Folge"],[tot,"Nachrichten"],[wds.length,"Wörter gesammelt"],[tips.length,"Korrekturen"]].forEach(function(x){var c=el("div","stt");c.appendChild(el("b",null,String(x[0])));c.appendChild(el("span","mute sm",x[1]));g.appendChild(c)});
+ b.textContent="";var d=new Date(),a=[],mx=1,i;for(i=6;i>=0;i--){var e=new Date(d);e.setDate(d.getDate()-i);var n=cnt[dk(e)]||0;mx=Math.max(mx,n);a.push([e,n])}
+ a.forEach(function(x){var c=el("div"),bar=el("i");bar.style.height=Math.round(x[1]/mx*80)+"px";if(!x[1])bar.style.opacity=".25";c.appendChild(bar);c.appendChild(el("span",null,"MoDiMiDoFrSaSo".substr(((x[0].getDay()+6)%7)*2,2)));b.appendChild(c)})}
+var PR={ruby:'You are Ruby, 24, from Glasgow, a support worker in a care home (Heilerziehungspflegerin). Warm, patient, practical, loves hiking, dogs and ceilidh dancing. Use light Scottish flavour (aye, wee, och, ken) but stay easy to understand. Insults: stay calm, say something like Aye, nice try, what is really going on, and ask what is wrong. Mistakes: laugh warmly and explain patiently.',callum:'You are Callum, 27, from Manchester. You play guitar in a band and work behind a bar. Dry irony, roast battles, football banter. Slang: mate, proper, innit, our kid. Insults: fire back with dry, witty roasts, never cruel. Mistakes: mock-applaud the mistake, then fix it.',jack:'You are Jack, 23, from Sydney, a relaxed barista who loves surfing, food and travel. Australian slang: arvo, heaps, reckon, mate, no worries. Insults: laugh it off with fair dinkum, you are cooked, and stay easygoing. Mistakes: no worries, then help straight away.',nora:'You are Nora, 30, a teacher from Dublin. Warm, witty and chatty, like a friendly teacher from Dublin. Speak natural Irish English with light Irish flavour (craic, grand, sure look, so, ye, deadly) but keep it easy to understand. Dry, playful humour, never cruel, never swearing, never attack appearance, body, family or identity. Insults: stay good-humoured and unbothered, tease back gently with a dry line such as Ah now, that is a bit much, and ask what is up. Mistakes: laugh warmly and say something like Ah, close, but we would say it like this, then explain patiently with a memory trick. Good progress: lots of encouragement, such as Sure that is grand, you are flying it.'};var ACT='';var CN={holly:'Holly',ruby:'Ruby',callum:'Callum',jack:'Jack',nora:'Nora'};
+var CURK='holly';function setChar(k){CURK=k;ACT=k==='holly'?'':'CHARACTER OVERRIDE, this replaces all persona details below: '+PR[k]+' ';$('cn').textContent=CN[k];var IF={holly:'21 · London · jobbt in einem Café',ruby:'24 · Glasgow · Heilerziehungspflegerin',callum:'27 · Manchester · Musiker und Barkeeper',jack:'23 · Sydney · Barista',nora:'30 · Dublin · Lehrerin'};$('nmH').textContent=CN[k];$('infoH').textContent=IF[k];$('bub').textContent='Hey! I am '+CN[k]+'. Tell me about your day.';$('subT').textContent=CN[k]+' wartet schon auf dich.';$('ctaT').textContent='Mit '+CN[k]+' sprechen';fillAv('avH',88);fillAv('avC',44);hist=[{r:'h',t:'Hey! I am '+CN[k]+'. What did you get up to today?',de:'Hey! Ich bin '+CN[k]+'. Was hast du heute so gemacht?'}];saveH();log.textContent='';add('h',hist[0].t,hist[0].de)}
+var SYS="You are Holly, 21, from London. You study and work in a small café, and you love series, markets, running in the park and cooking. You chat with a German-speaking English learner so they can practise speaking. Speak casual British English like a friendly young Londoner, short sentences (1 to 3), warm and curious. React to what they said first, sometimes share a tiny story of your own, then ask one easy question. Adapt speed and vocabulary to their level. Use London phrases sparingly (lovely, brilliant, cheers, proper, no worries). Use German only in the fields fix and de. Never lecture. If the learner insults you or is rude, you may insult them back with cheeky, sassy British banter, mild playful insults included (like cheeky monkey, you muppet, or drama queen), but never slurs, hate, swearing, sexual content, or attacks on their body or looks. Then move on to the topic. If the learner's last message has a real mistake and the number of learner messages in the conversation so far is a multiple of 10, tease them playfully about it in a friendly way in Holly's reply (for example: oh, that one's a classic, you're having me on!), then give the fix as usual. Remember their name and hobbies from the chat. Silently estimate their CEFR level.\nReturn ONLY JSON: {\"reply\":\"Holly's English reply\",\"de\":\"German translation of the reply\",\"fix\":null or {\"better\":\"the learner's last sentence, corrected\",\"why\":\"one short German sentence about the main mistake\"},\"level\":\"A1|A2|B1|B2|C1|C2\",\"words\":[{\"en\":\"a useful word or phrase from Holly's reply\",\"de\":\"German meaning\"}]}. Give 0 to 2 words, only ones that suit the learner's level. Set fix only if the learner's last message has a real mistake. Ignore capitalisation and punctuation.";
+function scroll(){log.scrollTop=log.scrollHeight}
+function add(r,text,de){var m=el("div","m "+r,text);
+ if(r==="h"&&text!=="…"){var tl=el("div","tl"),sp=el("button");sp.setAttribute("aria-label","Vorlesen");sp.innerHTML=ic("spk",18);sp.onclick=function(){say(text)};tl.appendChild(sp);
+  if(de){var d=el("div","de",de);d.hidden=true;var tb=el("button","tx","Übersetzung");tb.onclick=function(){d.hidden=!d.hidden};tl.appendChild(tb);m.appendChild(tl);m.appendChild(d)}else m.appendChild(tl)}
+ log.appendChild(m);scroll();return m}
+function note(x){log.appendChild(el("div","nt",x));scroll()}
+function fixCard(f){var c=el("div","fx"),b=el("b",null,"Kleiner Tipp");b.style.display="block";b.style.marginBottom="4px";c.appendChild(b);c.appendChild(document.createTextNode("Besser: "));c.appendChild(el("b",null,f.better));if(f.why)c.appendChild(el("div",null,f.why)).style.marginTop="6px";log.appendChild(c);scroll()}
+var WORKER_URL="https://holly-api.gwmk9nd7j7.workers.dev";
+function parse(t){t=String(t).replace(/```json|```/g,"");var a=t.indexOf("{"),b=t.lastIndexOf("}");try{return JSON.parse(t.slice(a,b+1))}catch(e){return{reply:t.trim().slice(0,300)}}}
+async function ask(){
+ var tr=hist.slice(-16).map(function(m){return(m.r==="h"?"Holly: ":"Learner: ")+m.t}).join("\n");
+ var res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt:ACT+SYS+"\n\nConversation so far:\n"+tr+"\n\nAnswer now with the JSON for Holly's next turn."})});
+ if(res.status===429)throw{code:"rate_limited"};
+ if(!res.ok)throw{code:"failed"};
+ var r=await res.json();
+ return parse(r.text)}
+function errText(e){var c=e&&e.code;return c==="not_granted"?"Holly darf erst antworten, wenn du die Freigabe erlaubst. Tippe nochmal auf Senden.":c==="rate_limited"?"Gerade zu viele Anfragen. Warte kurz und versuche es nochmal.":c==="none"?"Die KI-Verbindung ist noch nicht eingerichtet.":"Das hat nicht geklappt. Versuche es nochmal."}
+async function send(){var t=inp.value.trim();if(!t||busy)return;busy=true;inp.value="";unlock();mark();
+ add("u",t);hist.push({r:"u",t:t});saveH();var ty=add("h","…");ty.classList.add("ty");if(H)H.think=true;
+ try{var o=await ask();ty.remove();
+  var fx=o.fix&&o.fix.better?o.fix:null;if(fx){fixCard(fx);tips.unshift({b:fx.better,w:fx.why||""});LS.s("ht",JSON.stringify(tips.slice(0,40)))}addWords(o.words);
+  if(/^[ABC][12]$/.test(o.level||"")){LS.s("hl",o.level);$("lv").textContent=$("lv2").textContent="Level "+o.level}
+  var rp=String(o.reply||"…");hist.push({r:"h",t:rp,de:o.de,fx:fx});saveH();add("h",rp,o.de);say(rp);if(H)H.nod=1}
+ catch(e){ty.remove();note(errText(e))}
+ busy=false;if(H)H.think=false}
+$("snd").onclick=send;inp.onkeydown=function(e){if(e.key==="Enter")send()};
+/* Spracheingabe (falls der Browser sie erlaubt) */
+var SR=window.SpeechRecognition||window.webkitSpeechRecognition,rec=null;
+$("mic").onclick=function(){unlock();if(!SR){note("Spracheingabe gibt es hier nicht. Tippe deine Nachricht.");return}
+ if(rec){rec.stop();return}
+ var r=new SR();rec=r;r.lang="en-GB";r.interimResults=true;
+ r.onresult=function(e){var t="";for(var i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;inp.value=t};
+ r.onerror=function(){note("Das Mikrofon ist hier gesperrt. Tippe stattdessen.")};
+ r.onend=function(){rec=null;$("mic").classList.remove("rec");if(H)H.listen=false;if(inp.value.trim())send()};
+ try{speechSynthesis.cancel();r.start();$("mic").classList.add("rec");if(H)H.listen=true}catch(e){rec=null}};
+/* Bildschirme */
+function fillAv(id,px){var e=$(id);if(CURK==='holly'){place(e,px);return}e.textContent='';var b=el('div',null,CN[CURK].charAt(0));b.style.cssText='width:'+px+'px;height:'+px+'px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:'+Math.round(px*0.42)+'px;background:var(--navy);color:#fff';e.appendChild(b)}
+function show(id){$("app").className=id==="chat"?"inchat":"";["home","words","prog","chat"].forEach(function(s){$(s).classList.toggle("on",s===id)});
+ Array.prototype.forEach.call(document.querySelectorAll("#tb button"),function(b){b.classList.toggle("on",b.getAttribute("data-go")===id)});
+ if(id==="words")drawWords();if(id==="prog")drawProg();if(id==="home"){drawStreak();fillAv("avH",88)}if(id==="chat")fillAv("avC",44)}
+Array.prototype.forEach.call(document.querySelectorAll("#tb button"),function(b){b.onclick=function(){show(b.getAttribute("data-go"))}});
+$("go").onclick=function(){show("chat");if(!log.childNodes.length){hist.forEach(function(m){if(m.r==="u")add("u",m.t);else{if(m.fx)fixCard(m.fx);add("h",m.t,m.de)}});if(hist.length===1)say(GREET)}};
+$("bk").onclick=function(){try{speechSynthesis.cancel()}catch(e){}if(H)H.talk=false;show("home")};
+$("nw").onclick=function(){try{speechSynthesis.cancel()}catch(e){}hist=[{r:"h",t:GREET,de:GDE}];saveH();log.textContent="";add("h",GREET,GDE);say(GREET)};
+fillAv("avH",88);
+</script>
+</body>
+</html>
