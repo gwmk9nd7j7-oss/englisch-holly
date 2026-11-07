@@ -314,8 +314,8 @@ $("lgB").onclick=async function(){var e=$("lgE").value.trim(),m=$("lgM");
  if(!/^\S+@\S+\.\S+$/.test(e)){m.textContent="Bitte eine gültige E-Mail eingeben.";return}
  m.textContent="Sende Anmeldelink …";
  try{var r=await fetch(SB_URL+"/auth/v1/otp?redirect_to="+encodeURIComponent(location.origin+location.pathname),{method:"POST",headers:{"Content-Type":"application/json",apikey:SB_KEY},body:JSON.stringify({email:e,create_user:true})});
-  if(!r.ok)throw 0;m.textContent="Fertig! Schau in dein Postfach und tippe auf den Link. Bitte öffne ihn im selben Browser."}
- catch(x){m.textContent="Das hat nicht geklappt. Prüfe die Adresse und versuche es nochmal."}};
+  if(!r.ok){var t=await r.text();throw new Error(r.status+" "+t)}m.textContent="Fertig! Schau in dein Postfach und tippe auf den Link. Bitte öffne ihn im selben Browser."}
+ catch(x){m.textContent="Das hat nicht geklappt: "+(x&&x.message?x.message:"keine Verbindung")}};
 $("lo").onclick=function(){AUTH.clear();["hw","ht","hd","hc","hl","hm"].forEach(function(k){try{localStorage.removeItem(k)}catch(e){}});try{speechSynthesis.cancel()}catch(e){}showLogin(true)};
 if(!AUTH.valid())showLogin(true);else pullP();
 /* Bildschirme */
