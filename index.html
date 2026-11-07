@@ -311,8 +311,8 @@ var V={list:[],i:0,cur:null};
 function loadV(){if(!window.speechSynthesis)return;
  var rank=["sonia","libby","serena","kate","martha","google uk english female","hazel","susan","stephanie","amy","emma"],bad=/daniel|oliver|arthur|ryan|george|thomas|\bmale\b/i;
  function sc(v){var n=v.name.toLowerCase(),i=0;for(;i<rank.length;i++)if(n.indexOf(rank[i])>-1)break;return i-(/premium|enhanced|natural/.test(n)?20:0)}
- var all=speechSynthesis.getVoices().filter(function(v){return/^en[-_]GB/i.test(v.lang)&&!bad.test(v.name)});
- var fem=all.filter(function(v){return/sonia|libby|serena|kate|martha|female|hazel|susan|stephanie|amy|emma|samantha|moira|tessa/i.test(v.name)});if(fem.length)all=fem;
+ var en=speechSynthesis.getVoices().filter(function(v){return/^en/i.test(v.lang)&&!bad.test(v.name)});var gb=en.filter(function(v){return/^en[-_]GB/i.test(v.lang)});var all=gb.length?gb:en;
+ var fem=all.filter(function(v){return/sonia|libby|serena|kate|martha|female|hazel|susan|stephanie|amy|emma|samantha|moira|tessa|karen|fiona|victoria|allison|zoe|nicky/i.test(v.name)});if(fem.length)all=fem;
  all.sort(function(a,b){return sc(a)-sc(b)});V.list=all;
  var sv=LS.g("hv2"),ix=0;all.forEach(function(v,j){if(v.name===sv)ix=j});V.i=ix;V.cur=all[ix]||null;
  $("vc").style.display=all.length>1?"":"none"}
