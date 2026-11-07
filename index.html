@@ -192,11 +192,26 @@ var SB_URL="https://jsknjrtrlwdxxgurzptt.supabase.co",SB_KEY="sb_publishable_I7U
 var AUTH={
  get:function(){return LS.g("sbtok")||""},
  save:function(t,exp){LS.s("sbtok",t);LS.s("sbexp",String(exp))},
+ uid:function(){try{var b=AUTH.get().split(".")[1].replace(/-/g,"+").replace(/_/g,"/");while(b.length%4)b+="=";return JSON.parse(atob(b)).sub}catch(e){return null}},
  clear:function(){try{localStorage.removeItem("sbtok");localStorage.removeItem("sbexp")}catch(e){}},
  valid:function(){var e=+(LS.g("sbexp")||0);return !!AUTH.get()&&e*1000>Date.now()+60000}
 };
 (function(){var h=location.hash;if(h&&h.indexOf("access_token=")>-1){var p=new URLSearchParams(h.slice(1));var t=p.get("access_token");var ex=p.get("expires_at")||(Math.floor(Date.now()/1000)+3600);if(t)AUTH.save(t,ex);history.replaceState(null,"",location.pathname+location.search)}})();
 function showLogin(on){var g=document.getElementById("lg");if(g)g.hidden=!on}
+/* ===== Fortschritt im Konto (nur Level, Wörter, Korrekturen, Tage, Zähler) ===== */
+var saveT=null;
+function saveP(){clearTimeout(saveT);saveT=setTimeout(pushP,1500)}
+async function pushP(){if(!AUTH.valid())return;var uid=AUTH.uid();if(!uid)return;
+ var body={user_id:uid,level:LS.g("hl")||null,words:wds,tips:tips,days:days,counts:cnt,updated_at:new Date().toISOString()};
+ try{await fetch(SB_URL+"/rest/v1/progress",{method:"POST",headers:{"Content-Type":"application/json",apikey:SB_KEY,Authorization:"Bearer "+AUTH.get(),Prefer:"resolution=merge-duplicates"},body:JSON.stringify(body)})}catch(e){}}
+async function pullP(){if(!AUTH.valid())return;
+ try{var r=await fetch(SB_URL+"/rest/v1/progress?select=*",{headers:{apikey:SB_KEY,Authorization:"Bearer "+AUTH.get()}});if(!r.ok)return;
+  var rows=await r.json();if(!rows.length){pushP();return}
+  var p=rows[0];
+  if(p.level){LS.s("hl",p.level);$("lv").textContent=$("lv2").textContent="Level "+p.level}
+  wds=p.words||[];tips=p.tips||[];days=p.days||[];cnt=p.counts||{};
+  LS.s("hw",JSON.stringify(wds));LS.s("ht",JSON.stringify(tips));LS.s("hd",JSON.stringify(days));LS.s("hc",JSON.stringify(cnt));
+  drawStreak()}catch(e){}}
 var IC={mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',spk:'<path d="M4 9v6h4l5 4V5L8 9H4zM16 9a4 4 0 0 1 0 6"/>',snd:'<path d="M4 12l16-8-6 16-3-7-7-1z"/>',chat:'<path d="M4 5h16v11H9l-5 4V5z"/>',book:'<path d="M5 4h10a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3V4z"/>',bar:'<path d="M5 20V10M12 20V4M19 20v-7"/>',back:'<path d="M15 5l-7 7 7 7"/>'};
 function ic(n,s){return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+IC[n]+'</svg>'}
 Array.prototype.forEach.call(document.querySelectorAll("[data-ic]"),function(e){e.innerHTML=ic(e.getAttribute("data-ic"),e.getAttribute("data-s")||24)});
@@ -273,7 +288,7 @@ async function send(){var t=inp.value.trim();if(!t)return;if(busy){note("Holly a
  try{var o=await ask();ty.remove();
   var fx=o.fix&&o.fix.better&&nrm(o.fix.better)!==nrm(t)?o.fix:null;if(fx){fixCard(fx);tips.unshift({b:fx.better,w:fx.why||""});LS.s("ht",JSON.stringify(tips.slice(0,40)))}addWords(o.words);
   if(/^[ABC][12]$/.test(o.level||"")){LS.s("hl",o.level);$("lv").textContent=$("lv2").textContent="Level "+o.level}
-  var rp=String(o.reply||"…");hist.push({r:"h",t:rp,de:o.de,fx:fx});saveH();add("h",rp,o.de);say(rp);if(H)H.nod=1}
+  var rp=String(o.reply||"…");hist.push({r:"h",t:rp,de:o.de,fx:fx});saveH();add("h",rp,o.de);say(rp);if(H)H.nod=1;saveP()}
  catch(e){ty.remove();if(e&&e.code==="login")showLogin(true);note(errText(e))}
  busy=false;if(H)H.think=false}
 $("snd").onclick=send;inp.onkeydown=function(e){if(e.key==="Enter")send()};
@@ -293,8 +308,8 @@ $("lgB").onclick=async function(){var e=$("lgE").value.trim(),m=$("lgM");
  try{var r=await fetch(SB_URL+"/auth/v1/otp?redirect_to="+encodeURIComponent(location.origin+location.pathname),{method:"POST",headers:{"Content-Type":"application/json",apikey:SB_KEY},body:JSON.stringify({email:e,create_user:true})});
   if(!r.ok)throw 0;m.textContent="Fertig! Schau in dein Postfach und tippe auf den Link. Bitte öffne ihn im selben Browser."}
  catch(x){m.textContent="Das hat nicht geklappt. Prüfe die Adresse und versuche es nochmal."}};
-$("lo").onclick=function(){AUTH.clear();try{speechSynthesis.cancel()}catch(e){}showLogin(true)};
-if(!AUTH.valid())showLogin(true);
+$("lo").onclick=function(){AUTH.clear();["hw","ht","hd","hc","hl","hm"].forEach(function(k){try{localStorage.removeItem(k)}catch(e){}});try{speechSynthesis.cancel()}catch(e){}showLogin(true)};
+if(!AUTH.valid())showLogin(true);else pullP();
 /* Bildschirme */
 function fillAv(id,px){place($(id),px)}
 function show(id){$("app").className=id==="chat"?"inchat":"";["home","words","prog","chat"].forEach(function(s){$(s).classList.toggle("on",s===id)});
