@@ -55,7 +55,7 @@ h1{margin:0;font-size:34px;line-height:1.1}
 .nt{align-self:center;text-align:center;font-size:13px;color:var(--mute);padding:4px 12px}
 .bar{display:flex;align-items:center;gap:10px;padding:12px 14px 16px;background:var(--card);border-top:1px solid var(--line)}
 .rb,.nb{border-radius:50%;border:0;color:#fff;display:flex;align-items:center;justify-content:center;flex:none}
-.rb{width:56px;height:56px;background:var(--red)}.rb.rec{outline:4px solid rgba(196,43,32,.35)}
+.rb{width:56px;height:56px;background:var(--red)}.rb.rec{outline:4px solid rgba(196,43,32,.35);animation:recp 1.2s ease-in-out infinite}@keyframes recp{0%,100%{outline-color:rgba(196,43,32,.25)}50%{outline-color:rgba(196,43,32,.95)}}
 .nb{width:48px;height:48px;background:var(--navy)}
 #in{flex:1;min-width:0;height:48px;border:1.5px solid var(--line);border-radius:24px;padding:0 16px;font:inherit;font-size:16px;background:var(--bg);color:var(--ink)}
 #lg{display:flex}#lg[hidden]{display:none}
@@ -238,10 +238,17 @@ function loadV(){if(!window.speechSynthesis)return;
  var sv=LS.g("hv2"),ix=0;all.forEach(function(v,j){if(v.name===sv)ix=j});V.i=ix;V.cur=all[ix]||null;
  $("vc").style.display=all.length>1?"":"none"}
 if(window.speechSynthesis){loadV();speechSynthesis.onvoiceschanged=loadV}else $("vc").style.display="none";
-function say(text){if(rec){var rr=rec;rec=null;rr.onresult=null;try{rr.abort()}catch(e){}$("mic").classList.remove("rec");if(H)H.listen=false}if(!window.speechSynthesis)return;
- if(!V.cur)loadV();
- try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(text);u.lang="en-GB";if(V.cur)u.voice=V.cur;u.pitch=1.12;u.rate=1.03;
- u.onstart=function(){if(H)H.talk=true};u.onend=u.onerror=function(){if(H)H.talk=false};speechSynthesis.speak(u)}catch(e){}}
+function say(text){if(rec){var rr=rec;rec=null;rr.onresult=null;try{rr.abort()}catch(e){}$("mic").classList.remove("rec");inp.placeholder=PH;if(H)H.listen=false}
+ if(!window.speechSynthesis)return;if(!V.cur)loadV();
+ try{speechSynthesis.cancel();speechSynthesis.resume()}catch(e){}
+ setTimeout(function(){speakNow(text,V.cur,true)},150)}
+function speakNow(text,voice,retry){var u=new SpeechSynthesisUtterance(text);u.lang="en-GB";if(voice)u.voice=voice;u.pitch=1.12;u.rate=1.03;
+ u.onstart=function(){if(H)H.talk=true};
+ u.onend=function(){if(H)H.talk=false};
+ u.onerror=function(ev){if(H)H.talk=false;var er=ev&&ev.error||"unbekannt";if(er==="interrupted"||er==="canceled")return;
+  if(retry&&voice){speakNow(text,null,false);return}
+  note("Sprachausgabe nicht verfügbar ("+er+"). Bitte Lautstärke prüfen oder die Stimme wechseln.")};
+ try{speechSynthesis.speak(u)}catch(e){note("Sprachausgabe Fehler: "+e.message)}}
 function unlock(){try{speechSynthesis.speak(new SpeechSynthesisUtterance(""))}catch(e){}}
 $("vc").onclick=function(){if(!V.list.length)return;V.i=(V.i+1)%V.list.length;V.cur=V.list[V.i];LS.s("hv2",V.cur.name);$("st").textContent="Stimme: "+V.cur.name.replace(/^(Microsoft|Google)\s+/,"");say("Hiya! I’m Holly. How’s this voice sounding?")};
 /* Gespräch */
@@ -292,6 +299,7 @@ async function send(){var t=inp.value.trim();if(!t)return;if(busy){note("Holly a
  catch(e){ty.remove();if(e&&e.code==="login")showLogin(true);note(errText(e))}
  busy=false;if(H)H.think=false}
 $("snd").onclick=send;inp.onkeydown=function(e){if(e.key==="Enter")send()};
+var PH="Sprechen oder tippen …";
 /* Spracheingabe (falls der Browser sie erlaubt) */
 var SR=window.SpeechRecognition||window.webkitSpeechRecognition,rec=null;
 $("mic").onclick=function(){unlock();if(!SR){note("Spracheingabe gibt es hier nicht. Tippe deine Nachricht.");return}
@@ -299,8 +307,8 @@ $("mic").onclick=function(){unlock();if(!SR){note("Spracheingabe gibt es hier ni
  if(busy){note("Warte kurz, bis Holly fertig geantwortet hat.");return}var r=new SR();rec=r;r.lang="en-GB";r.interimResults=true;
  r.onresult=function(e){var t="";for(var i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;inp.value=t};
  r.onerror=function(){note("Das Mikrofon ist hier gesperrt. Tippe stattdessen.")};
- r.onend=function(){var live=rec===r;rec=null;$("mic").classList.remove("rec");if(H)H.listen=false;if(live&&inp.value.trim())send()};
- try{speechSynthesis.cancel();r.start();$("mic").classList.add("rec");if(H)H.listen=true}catch(e){rec=null}};
+ r.onend=function(){var live=rec===r;rec=null;$("mic").classList.remove("rec");inp.placeholder=PH;if(live&&!inp.value.trim())note("Ich habe nichts gehört. Tippe auf den roten Knopf und sprich.");if(H)H.listen=false;if(live&&inp.value.trim())send()};
+ try{speechSynthesis.cancel();r.start();$("mic").classList.add("rec");inp.placeholder="Aufnahme läuft … tippe zum Senden";if(H)H.listen=true}catch(e){rec=null}};
 /* Login-Formular */
 $("lgB").onclick=async function(){var e=$("lgE").value.trim(),m=$("lgM");
  if(!/^\S+@\S+\.\S+$/.test(e)){m.textContent="Bitte eine gültige E-Mail eingeben.";return}
