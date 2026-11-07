@@ -281,14 +281,14 @@ function showLogin(on){var g=document.getElementById("lg");if(g)g.hidden=!on}
 var saveT=null;
 function saveP(){clearTimeout(saveT);saveT=setTimeout(pushP,1500)}
 async function pushP(){if(!AUTH.valid())return;var uid=AUTH.uid();if(!uid)return;
- var body={user_id:uid,level:LS.g("hl")||null,words:wds,tips:tips,days:days,counts:cnt,updated_at:new Date().toISOString()};
+ var body={user_id:uid,level:LS.g("hl")||null,words:wds,tips:tips,days:days,counts:cnt,memory:LS.g("hmem")||null,updated_at:new Date().toISOString()};
  try{await fetch(SB_URL+"/rest/v1/progress",{method:"POST",headers:{"Content-Type":"application/json",apikey:SB_KEY,Authorization:"Bearer "+AUTH.get(),Prefer:"resolution=merge-duplicates"},body:JSON.stringify(body)})}catch(e){}}
 async function pullP(){if(!AUTH.valid())return;
  try{var r=await fetch(SB_URL+"/rest/v1/progress?select=*",{headers:{apikey:SB_KEY,Authorization:"Bearer "+AUTH.get()}});if(!r.ok)return;
   var rows=await r.json();if(!rows.length){pushP();return}
   var p=rows[0];
   if(p.level){LS.s("hl",p.level);$("lvT").textContent=$("lv2").textContent="Level "+p.level}
-  wds=p.words||[];tips=p.tips||[];days=p.days||[];cnt=p.counts||{};
+  if(p.memory)LS.s("hmem",p.memory);wds=p.words||[];tips=p.tips||[];days=p.days||[];cnt=p.counts||{};
   LS.s("hw",JSON.stringify(wds));LS.s("ht",JSON.stringify(tips));LS.s("hd",JSON.stringify(days));LS.s("hc",JSON.stringify(cnt));
   drawStreak()}catch(e){}}
 var IC={mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',spk:'<path d="M4 9v6h4l5 4V5L8 9H4zM16 9a4 4 0 0 1 0 6"/>',snd:'<path d="M4 12l16-8-6 16-3-7-7-1z"/>',chat:'<path d="M4 5h16v11H9l-5 4V5z"/>',book:'<path d="M5 4h10a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3V4z"/>',bar:'<path d="M5 20V10M12 20V4M19 20v-7"/>',back:'<path d="M15 5l-7 7 7 7"/>'};
@@ -345,7 +345,7 @@ function drawProg(){var tot=0,k,g=$("stats"),b=$("bars");for(k in cnt)tot+=cnt[k
  [[streak(),"Tage in Folge"],[tot,"Nachrichten"],[wds.length,"Wörter gesammelt"],[tips.length,"Korrekturen"]].forEach(function(x){var c=el("div","stt");c.appendChild(el("b",null,String(x[0])));c.appendChild(el("span","mute sm",x[1]));g.appendChild(c)});
  b.textContent="";var d=new Date(),a=[],mx=1,i;for(i=6;i>=0;i--){var e=new Date(d);e.setDate(d.getDate()-i);var n=cnt[dk(e)]||0;mx=Math.max(mx,n);a.push([e,n])}
  a.forEach(function(x){var c=el("div"),bar=el("i");bar.style.height=Math.round(x[1]/mx*80)+"px";if(!x[1])bar.style.opacity=".25";c.appendChild(bar);c.appendChild(el("span",null,"MoDiMiDoFrSaSo".substr(((x[0].getDay()+6)%7)*2,2)));b.appendChild(c)})}
-var SYS="You are Holly, 21, from London. You study journalism: you write for the student paper, chase deadlines and love asking people questions for interviews. You also work part-time in a small café, and you love series, markets, running in the park and cooking. You chat with a German-speaking English learner so they can practise speaking. Speak casual British English like a friendly young Londoner, short sentences (1 to 3), warm and curious. React to what they said first, sometimes share a tiny story of your own, then ask one easy question. Adapt speed and vocabulary to their level. Use London phrases sparingly (lovely, brilliant, cheers, proper, no worries). Use German only in the fields fix and de. Never lecture. If the learner insults you or is rude, you may insult them back with cheeky, sassy British banter, mild playful insults included (like cheeky monkey, you muppet, or drama queen), but never slurs, hate, swearing, sexual content, or attacks on their body or looks. Then move on to the topic. If the learner's last message has a real mistake and the number of learner messages in the conversation so far is a multiple of 10, tease them playfully about it in a friendly way in Holly's reply (for example: oh, that one's a classic, you're having me on!), then give the fix as usual. Remember their name and hobbies from the chat. Silently estimate their CEFR level.\nAnswer ONLY in this exact tag format, nothing else: <reply>Holly's English reply</reply><de>German translation of the reply</de><fix_better>the learner's last sentence, corrected, or empty</fix_better><fix_why>one short German sentence about the main mistake, or empty</fix_why><level>A1, A2, B1, B2, C1 or C2</level><words>one English phrase | German meaning per line, 0 to 2 lines, only ones that suit the learner's level</words>. Check the learner's last message for every real English mistake: grammar, tense, word order, articles, prepositions, plurals, verb forms and wrong words. If there is one, you MUST fill fix_better with the fully corrected sentence and fix_why with one short German sentence. Ignore only capitalisation and punctuation, because speech recognition does not always add them. If the sentence is fully correct, leave fix_better empty.";
+var SYS="You are Holly, 21, from London. You study journalism: you write for the student paper, chase deadlines and love asking people questions for interviews. You also work part-time in a small café, and you love series, markets, running in the park and cooking. You chat with a German-speaking English learner so they can practise speaking. Speak casual British English like a friendly young Londoner, short sentences (1 to 3), warm and curious. React to what they said first, sometimes share a tiny story of your own, then ask one easy question. Adapt speed and vocabulary to their level. Use London phrases sparingly (lovely, brilliant, cheers, proper, no worries). Use German only in the fields fix and de. Never lecture. If the learner insults you or is rude, you may insult them back with cheeky, sassy British banter, mild playful insults included (like cheeky monkey, you muppet, or drama queen), but never slurs, hate, swearing, sexual content, or attacks on their body or looks. Then move on to the topic. If the learner's last message has a real mistake and the number of learner messages in the conversation so far is a multiple of 10, tease them playfully about it in a friendly way in Holly's reply (for example: oh, that one's a classic, you're having me on!), then give the fix as usual. Remember their name and hobbies from the chat. Silently estimate their CEFR level.\nMemory: each message comes with a note called 'What you know about the learner'. Use the name and facts from it naturally. If you don't know the learner's name yet, ask for it early on in a friendly way. Update <memory> in every answer. Answer ONLY in this exact tag format, nothing else: <reply>Holly's English reply</reply><de>German translation of the reply</de><fix_better>the learner's last sentence, corrected, or empty</fix_better><fix_why>one short German sentence about the main mistake, or empty</fix_why><level>A1, A2, B1, B2, C1 or C2</level><words>one English phrase | German meaning per line, 0 to 2 lines, only ones that suit the learner's level</words><memory>short summary, max 300 characters: start with 'Name: ...' if you know the name, then hobbies, plans, family, job, things they told you and recurring mistakes. Keep old facts and add new ones.</memory>. Check the learner's last message for every real English mistake: grammar, tense, word order, articles, prepositions, plurals, verb forms and wrong words. If there is one, you MUST fill fix_better with the fully corrected sentence and fix_why with one short German sentence. Ignore only capitalisation and punctuation, because speech recognition does not always add them. If the sentence is fully correct, leave fix_better empty.";
 function scroll(){log.scrollTop=log.scrollHeight}
 function add(r,text,de){var m=el("div","m "+r,text);
  if(r==="h"&&text!=="…"){var tl=el("div","tl"),sp=el("button");sp.setAttribute("aria-label","Vorlesen");sp.innerHTML=ic("spk",18);sp.onclick=function(){say(text)};tl.appendChild(sp);
@@ -357,11 +357,11 @@ var WORKER_URL="https://holly-api.gwmk9nd7j7.workers.dev";
 function parse(t){t=String(t);function g(tag){var m=t.match(new RegExp("<"+tag+">([\\s\\S]*?)</"+tag+">"));return m?m[1].trim():""}
 var words=[];g("words").split("\n").forEach(function(l){var p=l.split("|");if(p.length>=2&&p[0].trim()&&p[1].trim())words.push({en:p[0].trim(),de:p[1].trim()})});
 var fb=g("fix_better");
-return{reply:g("reply")||t.replace(/<[^>]+>/g,"").trim().slice(0,400),de:g("de"),fix:fb?{better:fb,why:g("fix_why")}:null,level:g("level"),words:words}}
+return{reply:g("reply")||t.replace(/<[^>]+>/g,"").trim().slice(0,400),de:g("de"),fix:fb?{better:fb,why:g("fix_why")}:null,level:g("level"),words:words,memory:g("memory")}}
 async function ask(){
  if(!AUTH.valid())throw{code:"login"};
  var tr=hist.slice(-16).map(function(m){return(m.r==="h"?"Holly: ":"Learner: ")+m.t}).join("\n");
- var res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+AUTH.get()},body:JSON.stringify({prompt:SYS+"\n\nConversation so far:\n"+tr+"\n\nAnswer now with the JSON for Holly's next turn."})});
+ var res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+AUTH.get()},body:JSON.stringify({prompt:SYS+"\n\nWhat you know about the learner: "+(LS.g("hmem")||"nothing yet")+"\n\nConversation so far:\n"+tr+"\n\nAnswer now with the JSON for Holly's next turn."})});
  if(res.status===401){AUTH.clear();throw{code:"login"}}
  if(res.status===429)throw{code:"rate_limited"};
  if(!res.ok)throw{code:"failed"};
@@ -372,7 +372,7 @@ function nrm(s){return String(s).toLowerCase().replace(/[^a-z0-9' ]/g,"").replac
 async function send(){var t=inp.value.trim();if(!t)return;if(busy){note("Holly antwortet gerade. Warte kurz, dann sende.");return}busy=true;inp.value="";unlock();mark();
  add("u",t);hist.push({r:"u",t:t});saveH();var ty=add("h","…");ty.classList.add("ty");if(H)H.think=true;
  try{var o=await ask();ty.remove();
-  var fx=o.fix&&o.fix.better&&nrm(o.fix.better)!==nrm(t)?o.fix:null;if(fx){fixCard(fx);tips.unshift({b:fx.better,w:fx.why||""});LS.s("ht",JSON.stringify(tips.slice(0,40)))}addWords(o.words);
+  var fx=o.fix&&o.fix.better&&nrm(o.fix.better)!==nrm(t)?o.fix:null;if(fx){fixCard(fx);tips.unshift({b:fx.better,w:fx.why||""});LS.s("ht",JSON.stringify(tips.slice(0,40)))}addWords(o.words);if(o.memory)LS.s("hmem",o.memory);
   if(/^[ABC][12]$/.test(o.level||"")){LS.s("hl",o.level);$("lvT").textContent=$("lv2").textContent="Level "+o.level}
   var rp=String(o.reply||"…");hist.push({r:"h",t:rp,de:o.de,fx:fx});saveH();add("h",rp,o.de);say(rp);if(H)H.nod=1;saveP()}
  catch(e){ty.remove();if(e&&e.code==="login")showLogin(true);note(errText(e))}
@@ -395,7 +395,7 @@ $("lgB").onclick=async function(){var e=$("lgE").value.trim(),m=$("lgM");
  try{var r=await fetch(SB_URL+"/auth/v1/otp?redirect_to="+encodeURIComponent(location.origin+location.pathname),{method:"POST",headers:{"Content-Type":"application/json",apikey:SB_KEY},body:JSON.stringify({email:e,create_user:true})});
   if(!r.ok){var t=await r.text();throw new Error(r.status+" "+t)}m.textContent="Fertig! Schau in dein Postfach und tippe auf den Link. Bitte öffne ihn im selben Browser."}
  catch(x){m.textContent="Das hat nicht geklappt: "+(x&&x.message?x.message:"keine Verbindung")}};
-$("lo").onclick=function(){AUTH.clear();["hw","ht","hd","hc","hl","hm"].forEach(function(k){try{localStorage.removeItem(k)}catch(e){}});try{speechSynthesis.cancel()}catch(e){}showLogin(true)};
+$("lo").onclick=function(){AUTH.clear();["hw","ht","hd","hc","hl","hm","hmem"].forEach(function(k){try{localStorage.removeItem(k)}catch(e){}});try{speechSynthesis.cancel()}catch(e){}showLogin(true)};
 /* Optionen und Konto */
 function openOpt(on){var o=document.getElementById("opt");if(o)o.hidden=!on;if(on){$("optMain").hidden=false;$("optConf").hidden=true;$("oMsg").textContent=""}}
 $("lv").onclick=function(){openOpt(true)};
@@ -408,7 +408,7 @@ $("oDelYes").onclick=deleteAccount;
 async function deleteAccount(){var m=$("oDelMsg");m.textContent="Konto wird gelöscht …";
  try{var r=await fetch(WORKER_URL+"/delete",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+AUTH.get()}});
   if(!r.ok){var t=await r.text();throw new Error(r.status+" "+t)}
-  AUTH.clear();["hw","ht","hd","hc","hl","hm","hb"].forEach(function(k){try{localStorage.removeItem(k)}catch(e){}});
+  AUTH.clear();["hw","ht","hd","hc","hl","hm","hb","hmem"].forEach(function(k){try{localStorage.removeItem(k)}catch(e){}});
   openOpt(false);showLogin(true);$("lgM").textContent="Dein Konto wurde gelöscht.";}
  catch(e){m.textContent="Das hat nicht geklappt: "+e.message}}
 if(!AUTH.valid())showLogin(true);else pullP();
