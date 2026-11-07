@@ -58,6 +58,7 @@ h1{margin:0;font-size:34px;line-height:1.1}
 .rb{width:56px;height:56px;background:var(--red)}.rb.rec{outline:4px solid rgba(196,43,32,.35)}
 .nb{width:48px;height:48px;background:var(--navy)}
 #in{flex:1;min-width:0;height:48px;border:1.5px solid var(--line);border-radius:24px;padding:0 16px;font:inherit;font-size:16px;background:var(--bg);color:var(--ink)}
+#lg{display:flex}#lg[hidden]{display:none}
 </style>
 </head>
 <body>
@@ -81,6 +82,7 @@ h1{margin:0;font-size:34px;line-height:1.1}
   <div class="grow"><b id="cn" style="font-size:18px">Holly</b><div class="mute" style="font-size:13px" id="st">online · britisches Englisch</div></div>
   <button id="vc" aria-label="Andere Stimme wählen">Stimme</button>
   <button id="nw" aria-label="Neues Gespräch">Neu</button>
+  <button id="lo" aria-label="Abmelden">Abmelden</button>
  </header>
  <div class="log" id="log" aria-live="polite"></div>
  <div class="bar">
@@ -92,6 +94,15 @@ h1{margin:0;font-size:34px;line-height:1.1}
 <section id="words" class="scr"><div class="pad"><div class="top"><span>Wörter</span></div><p class="mute" style="margin:0">Neue Wörter und Tipps aus deinen Gesprächen.</p><div id="wl" class="lst"></div></div></section>
 <section id="prog" class="scr"><div class="pad"><div class="top"><span>Fortschritt</span><span class="pill" id="lv2">Level –</span></div><div class="grid" id="stats"></div><div class="card"><b>Nachrichten pro Tag</b><div class="bars" id="bars"></div></div></div></section>
 <nav class="tabs" id="tb" aria-label="Bereiche"><button data-go="home" class="on"><i data-ic="chat"></i>Gespräch</button><button data-go="words"><i data-ic="book"></i>Wörter</button><button data-go="prog"><i data-ic="bar"></i>Fortschritt</button></nav>
+<div id="lg" hidden style="position:fixed;inset:0;background:color-mix(in srgb,var(--bg) 55%,transparent);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);z-index:50;align-items:center;justify-content:center;padding:24px;padding-top:calc(24px + env(safe-area-inset-top,0px))">
+ <div class="card" style="max-width:380px;width:100%">
+  <h1 style="font-size:26px">Englisch mit Holly</h1>
+  <p class="mute" style="margin:0">Gib deine E-Mail ein. Du bekommst einen Anmeldelink, ein Passwort brauchst du nicht.</p>
+  <input id="lgE" type="email" placeholder="deine@email.de" autocomplete="email" style="height:48px;border:1.5px solid var(--line);border-radius:12px;padding:0 14px;font:inherit;font-size:16px;background:var(--bg);color:var(--ink)">
+  <button class="cta" id="lgB">Anmeldelink senden</button>
+  <p class="mute sm" id="lgM" style="margin:0"></p>
+ </div>
+</div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
@@ -176,6 +187,16 @@ return S})();
 var $=function(i){return document.getElementById(i)};
 function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
 var LS={g:function(k){try{return localStorage.getItem(k)}catch(e){return null}},s:function(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+/* ===== Login (Supabase Magic Link) ===== */
+var SB_URL="https://jsknjrtrlwdxxgurzptt.supabase.co",SB_KEY="sb_publishable_I7UQbbzlA3sTGpj7C1x6ng_ueBTbN4r";
+var AUTH={
+ get:function(){return LS.g("sbtok")||""},
+ save:function(t,exp){LS.s("sbtok",t);LS.s("sbexp",String(exp))},
+ clear:function(){try{localStorage.removeItem("sbtok");localStorage.removeItem("sbexp")}catch(e){}},
+ valid:function(){var e=+(LS.g("sbexp")||0);return !!AUTH.get()&&e*1000>Date.now()+60000}
+};
+(function(){var h=location.hash;if(h&&h.indexOf("access_token=")>-1){var p=new URLSearchParams(h.slice(1));var t=p.get("access_token");var ex=p.get("expires_at")||(Math.floor(Date.now()/1000)+3600);if(t)AUTH.save(t,ex);history.replaceState(null,"",location.pathname+location.search)}})();
+function showLogin(on){var g=document.getElementById("lg");if(g)g.hidden=!on}
 var IC={mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',spk:'<path d="M4 9v6h4l5 4V5L8 9H4zM16 9a4 4 0 0 1 0 6"/>',snd:'<path d="M4 12l16-8-6 16-3-7-7-1z"/>',chat:'<path d="M4 5h16v11H9l-5 4V5z"/>',book:'<path d="M5 4h10a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3V4z"/>',bar:'<path d="M5 20V10M12 20V4M19 20v-7"/>',back:'<path d="M15 5l-7 7 7 7"/>'};
 function ic(n,s){return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+IC[n]+'</svg>'}
 Array.prototype.forEach.call(document.querySelectorAll("[data-ic]"),function(e){e.innerHTML=ic(e.getAttribute("data-ic"),e.getAttribute("data-s")||24)});
@@ -237,13 +258,15 @@ var words=[];g("words").split("\n").forEach(function(l){var p=l.split("|");if(p.
 var fb=g("fix_better");
 return{reply:g("reply")||t.replace(/<[^>]+>/g,"").trim().slice(0,400),de:g("de"),fix:fb?{better:fb,why:g("fix_why")}:null,level:g("level"),words:words}}
 async function ask(){
+ if(!AUTH.valid())throw{code:"login"};
  var tr=hist.slice(-16).map(function(m){return(m.r==="h"?"Holly: ":"Learner: ")+m.t}).join("\n");
- var res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt:SYS+"\n\nConversation so far:\n"+tr+"\n\nAnswer now with the JSON for Holly's next turn."})});
+ var res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+AUTH.get()},body:JSON.stringify({prompt:SYS+"\n\nConversation so far:\n"+tr+"\n\nAnswer now with the JSON for Holly's next turn."})});
+ if(res.status===401){AUTH.clear();throw{code:"login"}}
  if(res.status===429)throw{code:"rate_limited"};
  if(!res.ok)throw{code:"failed"};
  var r=await res.json();
  return parse(r.text)}
-function errText(e){var c=e&&e.code;return c==="not_granted"?"Holly darf erst antworten, wenn du die Freigabe erlaubst. Tippe nochmal auf Senden.":c==="rate_limited"?"Gerade zu viele Anfragen. Warte kurz und versuche es nochmal.":c==="none"?"Die KI-Verbindung ist noch nicht eingerichtet.":"Das hat nicht geklappt. Versuche es nochmal."}
+function errText(e){var c=e&&e.code;return c==="login"?"Bitte melde dich an, um mit Holly zu sprechen.":c==="not_granted"?"Holly darf erst antworten, wenn du die Freigabe erlaubst. Tippe nochmal auf Senden.":c==="rate_limited"?"Gerade zu viele Anfragen. Warte kurz und versuche es nochmal.":c==="none"?"Die KI-Verbindung ist noch nicht eingerichtet.":"Das hat nicht geklappt. Versuche es nochmal."}
 function nrm(s){return String(s).toLowerCase().replace(/[^a-z0-9' ]/g,"").replace(/\s+/g," ").trim()}
 async function send(){var t=inp.value.trim();if(!t)return;if(busy){note("Holly antwortet gerade. Warte kurz, dann sende.");return}busy=true;inp.value="";unlock();mark();
  add("u",t);hist.push({r:"u",t:t});saveH();var ty=add("h","…");ty.classList.add("ty");if(H)H.think=true;
@@ -251,7 +274,7 @@ async function send(){var t=inp.value.trim();if(!t)return;if(busy){note("Holly a
   var fx=o.fix&&o.fix.better&&nrm(o.fix.better)!==nrm(t)?o.fix:null;if(fx){fixCard(fx);tips.unshift({b:fx.better,w:fx.why||""});LS.s("ht",JSON.stringify(tips.slice(0,40)))}addWords(o.words);
   if(/^[ABC][12]$/.test(o.level||"")){LS.s("hl",o.level);$("lv").textContent=$("lv2").textContent="Level "+o.level}
   var rp=String(o.reply||"…");hist.push({r:"h",t:rp,de:o.de,fx:fx});saveH();add("h",rp,o.de);say(rp);if(H)H.nod=1}
- catch(e){ty.remove();note(errText(e))}
+ catch(e){ty.remove();if(e&&e.code==="login")showLogin(true);note(errText(e))}
  busy=false;if(H)H.think=false}
 $("snd").onclick=send;inp.onkeydown=function(e){if(e.key==="Enter")send()};
 /* Spracheingabe (falls der Browser sie erlaubt) */
@@ -263,6 +286,15 @@ $("mic").onclick=function(){unlock();if(!SR){note("Spracheingabe gibt es hier ni
  r.onerror=function(){note("Das Mikrofon ist hier gesperrt. Tippe stattdessen.")};
  r.onend=function(){var live=rec===r;rec=null;$("mic").classList.remove("rec");if(H)H.listen=false;if(live&&inp.value.trim())send()};
  try{speechSynthesis.cancel();r.start();$("mic").classList.add("rec");if(H)H.listen=true}catch(e){rec=null}};
+/* Login-Formular */
+$("lgB").onclick=async function(){var e=$("lgE").value.trim(),m=$("lgM");
+ if(!/^\S+@\S+\.\S+$/.test(e)){m.textContent="Bitte eine gültige E-Mail eingeben.";return}
+ m.textContent="Sende Anmeldelink …";
+ try{var r=await fetch(SB_URL+"/auth/v1/otp?redirect_to="+encodeURIComponent(location.origin+location.pathname),{method:"POST",headers:{"Content-Type":"application/json",apikey:SB_KEY},body:JSON.stringify({email:e,create_user:true})});
+  if(!r.ok)throw 0;m.textContent="Fertig! Schau in dein Postfach und tippe auf den Link. Bitte öffne ihn im selben Browser."}
+ catch(x){m.textContent="Das hat nicht geklappt. Prüfe die Adresse und versuche es nochmal."}};
+$("lo").onclick=function(){AUTH.clear();try{speechSynthesis.cancel()}catch(e){}showLogin(true)};
+if(!AUTH.valid())showLogin(true);
 /* Bildschirme */
 function fillAv(id,px){place($(id),px)}
 function show(id){$("app").className=id==="chat"?"inchat":"";["home","words","prog","chat"].forEach(function(s){$(s).classList.toggle("on",s===id)});
