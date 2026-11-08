@@ -59,6 +59,7 @@ h1{margin:0;font-size:34px;line-height:1.1}
 .nb{width:48px;height:48px;background:var(--navy)}
 #in{flex:1;min-width:0;height:48px;border:1.5px solid var(--line);border-radius:24px;padding:0 16px;font:inherit;font-size:16px;background:var(--bg);color:var(--ink)}
 #lg{display:flex}#lg[hidden]{display:none}#opt{display:flex}#opt[hidden]{display:none}.optb{display:block;width:100%;text-align:left;padding:14px 4px;font-size:16px;border:0;border-bottom:1px solid var(--line);background:none;color:var(--ink);cursor:pointer;font-family:inherit}
+form.bar{margin:0}
 </style>
 </head>
 <body>
@@ -85,11 +86,11 @@ h1{margin:0;font-size:34px;line-height:1.1}
   <button id="lo" aria-label="Abmelden">Abmelden</button>
  </header>
  <div class="log" id="log" aria-live="polite"></div>
- <div class="bar">
-  <button class="rb" id="mic" aria-label="Sprechen"><i data-ic="mic"></i></button>
-  <input id="in" type="text" aria-label="Nachricht" placeholder="Sprechen oder tippen …" autocomplete="off">
-  <button class="nb" id="snd" aria-label="Senden"><i data-ic="snd" data-s="20"></i></button>
- </div>
+ <form class="bar" id="fm" autocomplete="off">
+  <button type="button" class="rb" id="mic" aria-label="Sprechen"><i data-ic="mic"></i></button>
+  <input id="in" type="text" aria-label="Nachricht" placeholder="Sprechen oder tippen …" autocomplete="off" enterkeyhint="send">
+  <button type="button" class="nb" id="snd" aria-label="Senden"><i data-ic="snd" data-s="20"></i></button>
+ </form>
 </section>
 <section id="words" class="scr"><div class="pad"><div class="top"><span>Wörter</span></div><p class="mute" style="margin:0">Neue Wörter und Tipps aus deinen Gesprächen.</p><div id="wl" class="lst"></div></div></section>
 <section id="prog" class="scr"><div class="pad"><div class="top"><span>Fortschritt</span><span class="pill" id="lv2">Level –</span></div><div class="grid" id="stats"></div><div class="card"><b>Nachrichten pro Tag</b><div class="bars" id="bars"></div></div></div></section>
@@ -320,12 +321,12 @@ if(window.speechSynthesis){loadV();speechSynthesis.onvoiceschanged=loadV}else $(
 function say(text){if(rec){var rr=rec;rec=null;rr.onresult=null;try{rr.abort()}catch(e){}$("mic").classList.remove("rec");inp.placeholder=PH;if(H)H.listen=false}
  if(!window.speechSynthesis)return;if(!V.cur)loadV();
  try{speechSynthesis.cancel();speechSynthesis.resume()}catch(e){}
- setTimeout(function(){speakNow(text,V.cur,true)},150)}
-function speakNow(text,voice,retry){var u=new SpeechSynthesisUtterance(text);u.lang="en-GB";if(voice)u.voice=voice;u.pitch=1.12;u.rate=1.03;
+ setTimeout(function(){speakNow(text,0)},250)}
+function speakNow(text,k){var list=V.list||[],n=list.length;var voice=(n&&k<3)?list[(V.i+k)%n]:null;var u=new SpeechSynthesisUtterance(text);u.lang="en-GB";if(voice)u.voice=voice;u.pitch=1.12;u.rate=1.03;
  u.onstart=function(){if(H)H.talk=true};
  u.onend=function(){if(H)H.talk=false};
  u.onerror=function(ev){if(H)H.talk=false;var er=ev&&ev.error||"unbekannt";if(er==="interrupted"||er==="canceled")return;
-  if(retry&&voice){speakNow(text,null,false);return}
+  if(k<2&&(V.list||[]).length){speakNow(text,k+1);return}
   note("Sprachausgabe nicht verfügbar ("+er+"). Bitte Lautstärke prüfen oder die Stimme wechseln.")};
  try{speechSynthesis.speak(u)}catch(e){note("Sprachausgabe Fehler: "+e.message)}}
 function unlock(){try{speechSynthesis.speak(new SpeechSynthesisUtterance(""))}catch(e){}}
@@ -367,7 +368,7 @@ async function ask(){
  if(!res.ok)throw{code:"failed"};
  var r=await res.json();
  return parse(r.text)}
-function errText(e){var c=e&&e.code;return c==="login"?"Bitte melde dich an, um mit Holly zu sprechen.":c==="not_granted"?"Holly darf erst antworten, wenn du die Freigabe erlaubst. Tippe nochmal auf Senden.":c==="rate_limited"?"Gerade zu viele Anfragen. Warte kurz und versuche es nochmal.":c==="none"?"Die KI-Verbindung ist noch nicht eingerichtet.":"Das hat nicht geklappt. Versuche es nochmal."}
+function errText(e){var c=e&&e.code;return c==="login"?"Bitte melde dich an, um mit Holly zu sprechen.":c==="not_granted"?"Holly darf erst antworten, wenn du die Freigabe erlaubst. Tippe nochmal auf Senden.":c==="rate_limited"?"Dein Tageslimit für heute ist erreicht. Morgen geht es weiter.":c==="none"?"Die KI-Verbindung ist noch nicht eingerichtet.":"Das hat nicht geklappt. Versuche es nochmal."}
 function nrm(s){return String(s).toLowerCase().replace(/[^a-z0-9' ]/g,"").replace(/\s+/g," ").trim()}
 async function send(){var t=inp.value.trim();if(!t)return;if(busy){note("Holly antwortet gerade. Warte kurz, dann sende.");return}busy=true;inp.value="";unlock();mark();
  add("u",t);hist.push({r:"u",t:t});saveH();var ty=add("h","…");ty.classList.add("ty");if(H)H.think=true;
@@ -377,7 +378,7 @@ async function send(){var t=inp.value.trim();if(!t)return;if(busy){note("Holly a
   var rp=String(o.reply||"…");hist.push({r:"h",t:rp,de:o.de,fx:fx});saveH();add("h",rp,o.de);say(rp);if(H)H.nod=1;saveP()}
  catch(e){ty.remove();if(e&&e.code==="login")showLogin(true);note(errText(e))}
  busy=false;if(H)H.think=false}
-$("snd").onclick=send;inp.onkeydown=function(e){if(e.key==="Enter")send()};
+$("snd").onclick=send;$("fm").onsubmit=function(e){e.preventDefault();send()};
 var PH="Sprechen oder tippen …";
 /* Spracheingabe (falls der Browser sie erlaubt) */
 var SR=window.SpeechRecognition||window.webkitSpeechRecognition,rec=null;
