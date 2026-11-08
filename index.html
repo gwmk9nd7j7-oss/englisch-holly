@@ -362,13 +362,13 @@ return{reply:g("reply")||t.replace(/<[^>]+>/g,"").trim().slice(0,400),de:g("de")
 async function ask(){
  if(!AUTH.valid())throw{code:"login"};
  var tr=hist.slice(-16).map(function(m){return(m.r==="h"?"Holly: ":"Learner: ")+m.t}).join("\n");
- var res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+AUTH.get()},body:JSON.stringify({prompt:SYS+"\n\nWhat you know about the learner: "+(LS.g("hmem")||"nothing yet")+"\n\nConversation so far:\n"+tr+"\n\nAnswer now with the JSON for Holly's next turn."})});
+ var ac=new AbortController();var tm=setTimeout(function(){ac.abort()},30000);var res;try{res=await fetch(WORKER_URL,{method:"POST",signal:ac.signal,headers:{"Content-Type":"application/json","Authorization":"Bearer "+AUTH.get()},body:JSON.stringify({prompt:SYS+"\n\nWhat you know about the learner: "+(LS.g("hmem")||"nothing yet")+"\n\nConversation so far:\n"+tr+"\n\nAnswer now with the JSON for Holly's next turn."})})}catch(err){clearTimeout(tm);if(err&&err.name==="AbortError")throw{code:"timeout"};throw err}clearTimeout(tm);
  if(res.status===401){AUTH.clear();throw{code:"login"}}
  if(res.status===429)throw{code:"rate_limited"};
  if(!res.ok)throw{code:"failed"};
  var r=await res.json();
  return parse(r.text)}
-function errText(e){var c=e&&e.code;return c==="login"?"Bitte melde dich an, um mit Holly zu sprechen.":c==="not_granted"?"Holly darf erst antworten, wenn du die Freigabe erlaubst. Tippe nochmal auf Senden.":c==="rate_limited"?"Dein Tageslimit für heute ist erreicht. Morgen geht es weiter.":c==="none"?"Die KI-Verbindung ist noch nicht eingerichtet.":"Das hat nicht geklappt. Versuche es nochmal."}
+function errText(e){var c=e&&e.code;return c==="timeout"?"Holly hat nicht rechtzeitig geantwortet. Deine Nachricht steht noch im Feld, tippe einfach nochmal auf Senden.":c==="login"?"Bitte melde dich an, um mit Holly zu sprechen.":c==="not_granted"?"Holly darf erst antworten, wenn du die Freigabe erlaubst. Tippe nochmal auf Senden.":c==="rate_limited"?"Dein Tageslimit für heute ist erreicht. Morgen geht es weiter.":c==="none"?"Die KI-Verbindung ist noch nicht eingerichtet.":"Das hat nicht geklappt. Versuche es nochmal."}
 function nrm(s){return String(s).toLowerCase().replace(/[^a-z0-9' ]/g,"").replace(/\s+/g," ").trim()}
 async function send(){var t=inp.value.trim();if(!t)return;if(busy){note("Holly antwortet gerade. Warte kurz, dann sende.");return}busy=true;inp.value="";unlock();mark();
  add("u",t);hist.push({r:"u",t:t});saveH();var ty=add("h","…");ty.classList.add("ty");if(H)H.think=true;
@@ -376,7 +376,7 @@ async function send(){var t=inp.value.trim();if(!t)return;if(busy){note("Holly a
   var fx=o.fix&&o.fix.better&&nrm(o.fix.better)!==nrm(t)?o.fix:null;if(fx){fixCard(fx);tips.unshift({b:fx.better,w:fx.why||""});LS.s("ht",JSON.stringify(tips.slice(0,40)))}addWords(o.words);if(o.memory)LS.s("hmem",o.memory);
   if(/^[ABC][12]$/.test(o.level||"")){LS.s("hl",o.level);$("lvT").textContent=$("lv2").textContent="Level "+o.level}
   var rp=String(o.reply||"…");hist.push({r:"h",t:rp,de:o.de,fx:fx});saveH();add("h",rp,o.de);say(rp);if(H)H.nod=1;saveP()}
- catch(e){ty.remove();if(e&&e.code==="login")showLogin(true);note(errText(e))}
+ catch(e){ty.remove();if(e&&e.code==="login")showLogin(true);if(e&&e.code==="timeout"){inp.value=t}note(errText(e))}
  busy=false;if(H)H.think=false}
 $("snd").onclick=send;$("fm").onsubmit=function(e){e.preventDefault();send()};
 var PH="Sprechen oder tippen …";
